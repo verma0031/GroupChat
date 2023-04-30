@@ -1,4 +1,4 @@
-function userSignUp(){
+async function userSignUp(){
     try{
         console.log("adding user");
             const name = document.getElementById('name').value;
@@ -15,9 +15,11 @@ function userSignUp(){
 
             console.log(obj);
 
-            const response = axios.post ("http://localhost:4000/user/signup", obj)
+            const response = await axios.post ("http://localhost:4000/user/signup", obj)
 
-            if(response === 201){
+            console.log(response);
+
+            if(response.status === 201){
                 // window.location.href="./user/login.html";
                 alert('User signed up successfully')
             }
