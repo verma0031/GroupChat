@@ -4,30 +4,34 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
+    <title>Document</title>
 </head>
 <body>
     <div class="container">
-        <form action="#" id="form-control">
+        <form action="#">
             <label for="name">Name</label>
             <input type="text" id="name" value="">
-    
+            <br> <br>
             <label for="email">Email</label>
             <input type="text" id="email" value="">
-    
-            <label for="phone">Phone Number</label>
+            <br> <br>
+            <label for="phone">Phone</label>
             <input type="tel" id="phone" value="">
-    
+            <br> <br>
             <label for="password">Password</label>
             <input type="password" id="password" value="">
-    
-            <input type="submit" id="submit" value="SUBMIT" onclick="userSignUp()">
+            <br> <br>
+
+            <input type="button" id="clear" value="Sign Up" class="btn btn-primary" onclick="userSignUp()">
+            <br><br>
         </form>
     </div>
+    <br>
+
+    <a href="/user/login.html">Login for existing User</a>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 
-    <script src="/views/signup.js"></script>
-
+    <script src="/user/main.js"></script>
 </body>
 </html>

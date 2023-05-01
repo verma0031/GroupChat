@@ -17,11 +17,9 @@ async function userSignUp(){
 
             const response = await axios.post ("http://localhost:4000/user/signup", obj)
 
-            console.log(response);
-
             if(response.status === 201){
-                // window.location.href="./user/login.html";
                 alert('User signed up successfully')
+                // window.location.href="/login.html";
             }
             else{
                 throw new Error('Failed to login');
@@ -30,4 +28,28 @@ async function userSignUp(){
     catch(err){
         document.body. innerHTML += `<div style="color;red; ">${err} <div>` ;
     }
+}
+
+
+function login(e) {
+    e.preventDefault();
+    console.log(e.target.name);
+
+    const loginDetails = {
+        email: e.target.email.value,
+        password: e.target.password.value
+
+    }
+    console.log(loginDetails)
+    axios.post('http://localhost:4000/user/login',loginDetails).then(response => {
+        alert(response.data.message)
+
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('userDetails', JSON.stringify(response.data.user))
+
+            // window.location.href = "/user/index.html"
+    }).catch(err => {
+        console.log(JSON.stringify(err))
+        document.body.innerHTML += `<div style="color:red;">${err.message} <div>`;
+    })
 }
