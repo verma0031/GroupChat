@@ -47,7 +47,7 @@ function login(e) {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('userDetails', JSON.stringify(response.data.user))
 
-            // window.location.href = "/user/index.html"
+            window.location.href = "/user/chatapp.html"
     }).catch(err => {
         console.log(JSON.stringify(err))
         document.body.innerHTML += `<div style="color:red;">${err.message} <div>`;
