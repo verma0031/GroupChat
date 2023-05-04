@@ -1,5 +1,9 @@
 const Message = require('../model/message');
 
+const convertIntoSeconds = (time) => {
+    return new Date(`${time}`).getTime();
+}
+
 exports.sendMessage = async (req, res, next) => {
     const { message_text} = req.body;
     console.log(message_text, req.user);
@@ -10,4 +14,17 @@ exports.sendMessage = async (req, res, next) => {
     } catch (err) {
         console.log(err, 'err')
     }
+}
+
+exports.getMessage = async (req, res, next) => {
+    console.log("getting msg req");
+
+    const msg = await Message.findAll()
+    .then( (msg) => {
+        console.log(msg);
+        res.status(201).json({success:true, message:'fetched chat successfully',msg})
+    })
+    .catch( (err) => {
+        console.log(err);
+    })
 }

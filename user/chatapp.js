@@ -1,25 +1,41 @@
+const token = localStorage.getItem('token');
 
-async function sendMessage(e){
-    e.preventDefault();
-    console.log("Submit Clicked");
-    const token = localStorage.getItem('token');
-    const message_text = document.getElementById('message-input').value;
+window.addEventListener("DOMContentLoaded", async () => {
 
-    const msgData = {
-        message_text
+    const submit = document.getElementById('submit-button');
+    submit.onclick = onSubmit;
+
+    async function onSubmit(e){
+        e.preventDefault();
+
+        console.log("Submit Clicked");
+        const message_text = document.getElementById('message-input').value;
+    
+        const msgData = {
+            message_text
+        }
+    
+        console.log(msgData);
+    
+        await axios.post('http://localhost:4000/user/sendMessage', msgData, {headers: {authorization: token}})
+        .then( (response) => {
+            console.log("after post response", response);
+        })
     }
 
-    console.log(msgData);
 
-    await axios.post('http://localhost:4000/user/sendMessage', msgData, {headers: {authorization: token}})
+    
+
+    await axios.get('http://localhost:4000/user/getMessage', {headers: {authorization: token}})
     .then( (response) => {
-        console.log("after post response", response);
-        console.log("after post request",response.data.messageInfo.message_text);
-        addMesaageToChat(response.data.messageInfo.message_text, response.data.messageInfo.message_sender_name);
+        console.log(response);
+        for(var i=0; i<response.data.msg.length; i++){
+            console.log(response.data.msg[i].message_text);
+            addMesaageToChat(response.data.msg[i].message_text, response.data.msg[i].message_sender_name)
+        }
     })
+})
 
-
-}
 
 function addMesaageToChat(msg, sender){
     let parentNode = document.getElementById('chat-box');
