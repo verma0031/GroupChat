@@ -17,20 +17,40 @@ const generateAccessToken = (id, name) => {
 
 exports.signup = async (req, res, next)=>{
     try{
-    const { name, email,phone, password } = req.body;
+    const { name, email, phone, password } = req.body;
     console.log('email', email)
     if(isstringinvalid(name) || isstringinvalid(email || isstringinvalid(password))){
         return res.status(400).json({err: "Bad parameters . Something is missing"})
     }
     const saltrounds = 10;
     bcrypt.hash(password, saltrounds, async (err, hash) => {
-        console.log(err)
-        await User.create({ name, email,phone, password: hash })
-        res.status(201).json({message: 'Successfuly create new user'})
+
+        User.findAll({where: {phone: phone}}).then( async (users) => {
+            const user = users[0];
+            console.log("\nin signup\n",user);
+            if (user) {
+                res.json({success: false, message: "User Already exist. Please Login"});
+            }
+
+            else {
+                console.log("password is hashed As : ", hash);
+                await User.create({ name, email,phone, password: hash })
+                .then(() => {
+                    res.status(201).json({success: true, message: "Congratulations!! You have signed up successfully"});
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.json({ success: false, message: "error while registering" });
+                });
+            }
+        })
+        // console.log(err)
+        // await User.create({ name, email,phone, password: hash })
+        // res.status(201).json({message: 'Successfuly create new user'})
     })
-    }catch(err) {
-            res.status(500).json(err);
-        }
+}catch(err) {
+    res.status(500).json(err);
+}
 
 }
 

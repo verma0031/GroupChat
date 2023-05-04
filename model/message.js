@@ -3,17 +3,17 @@ const Sequelize = require('sequelize');
 const sequelize = require('../util/database');
 
 const Message = sequelize.define('message', {
-    msgid: {
+    id: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         allowNull: false,
-        autoIncrement: true,
-        primaryKey: true
+        autoIncrement:true
     },
-    username: {
+    message_text: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull:false
     },
-    message: {
+    message_sender_name: {
         type: Sequelize.STRING,
         allowNull: false
     }
