@@ -1,5 +1,5 @@
 const Message = require('../model/message');
-
+const { Op } = require("sequelize");
 const convertIntoSeconds = (time) => {
     return new Date(`${time}`).getTime();
 }
@@ -16,10 +16,32 @@ exports.sendMessage = async (req, res, next) => {
     }
 }
 
-exports.getMessage = async (req, res, next) => {
+exports.getOldMessages = async (req, res, next) => {
     console.log("getting msg req");
 
     const msg = await Message.findAll()
+    .then( (msg) => {
+        console.log(msg);
+        res.status(201).json({success:true, message:'fetched chat successfully',msg})
+    })
+    .catch( (err) => {
+        console.log(err);
+    })
+}
+
+exports.getNewMessages = async (req, res, next) => {
+    console.log("getting new msg req\n\n\n\n\n\n");
+    const lastID = req.headers.lastid;
+    console.log(lastID);
+    const msg = await Message.findAll(
+        {
+            where:{
+                id:{
+                    [Op.gt]: lastID
+                }
+            }
+        }
+    )
     .then( (msg) => {
         console.log(msg);
         res.status(201).json({success:true, message:'fetched chat successfully',msg})

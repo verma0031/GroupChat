@@ -1,62 +1,66 @@
+const parentNode = document.getElementById('chat-box');
 const token = localStorage.getItem('token');
+const messageField = document.getElementById("message-input");
+// await axios.get('http://localhost:4000/user/getMessage', {headers: {authorization: token}})
 
-async function getMessage(){
-    await axios.get('http://localhost:4000/user/getMessage', {headers: {authorization: token}})
-    .then( (response) => {
-        console.log(response);
-        clearChat()
-        for(var i=0; i<response.data.msg.length; i++){
-            console.log(response.data.msg[i].message_text);
-            addMesaageToChat(response.data.msg[i].message_text, response.data.msg[i].message_sender_name)
-        }
-    })
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
 }
 
-getMessage();
-
-setInterval(getMessage,1000)
-
-function clearChat() {
-    const chatMessages = document.getElementById('chat-box');
-    chatMessages.innerHTML = '';
-  }
-
-const submit = document.getElementById('submit-button');
-    submit.onclick = onSubmit;
-
-    async function onSubmit(e){
-        e.preventDefault();
-
-        console.log("Submit Clicked");
-        const message_text = document.getElementById('message-input').value;
-    
-        const msgData = {
-            message_text
+window.onload = async function() {
+    try{
+        let oldMessages = [];
+        const res = await axios.get('http://localhost:4000/user/getOldMessages', {headers: {authorization: token}});
+        for(const msg of res.data.msg) {
+            addMesaageToChat(msg.message_text, msg.message_sender_name);
+            oldMessages.push(msg);
         }
-    
-        console.log(msgData);
-    
-        await axios.post('http://localhost:4000/user/sendMessage', msgData, {headers: {authorization: token}})
-        .then( async (response) => {
-            console.log("after post response", response);
-        })
+        localStorage.setItem("lastID", res.data.msg[res.data.msg.length-1].id);
+        localStorage.setItem("oldMessages", JSON.stringify(oldMessages));
+    }catch(err){
+        console.log(err);
     }
+};
 
+async function getNewMessages() {
+    try{
+        let oldMessages = JSON.parse(localStorage.getItem("oldMessages"));
+        const res = await axios.get('http://localhost:4000/user/getNewMessages', {headers: {authorization: token, lastId: localStorage.getItem("lastID")}});
+        console.log("get messages", res);
+        for(const msg of res.data.msg) {
+            addMesaageToChat(msg.message_text, msg.message_sender_name);
+            oldMessages.push(msg);
+        }
+        if(res.data.msg.length > 0)
+        localStorage.setItem("lastID", res.data.msg[res.data.msg.length-1].id);
+        localStorage.setItem("oldMessages", JSON.stringify(oldMessages));
+    }catch(err){
+        console.log(err);
+    }
+}
 
+setInterval(getNewMessages, 1000);
 
-// window.addEventListener("DOMContentLoaded", async () => {
-
-    
-
-
-    
-    
-    
-// })
-
+async function sendMessage() {
+    console.log("Called");
+    try{
+        const decodeToken = parseJwt(token);
+        const user = decodeToken.name;
+        const message = messageField.value;
+        const res = await axios.post("http://localhost:4000/user/sendMessage", {message_text: message},{headers: {authorization: token, lastId: localStorage.getItem("lastID")}});
+        messageField.value = "";  
+    }catch(err){
+        console.log(err);
+    }
+}
 
 function addMesaageToChat(msg, sender){
-    let parentNode = document.getElementById('chat-box');
     let createDiv = document.createElement('div');
     let msg_content = document.createElement('p');
     msg_content.textContent =`${sender}: ${msg}`;
