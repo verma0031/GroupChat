@@ -3,6 +3,10 @@ const token = localStorage.getItem('token');
 const messageField = document.getElementById("message-input");
 // await axios.get('http://localhost:4000/user/getMessage', {headers: {authorization: token}})
 
+const decodeToken = parseJwt(token);
+const user = decodeToken.name;
+const myId = decodeToken.id;
+
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -47,11 +51,19 @@ async function getNewMessages() {
 
 setInterval(getNewMessages, 1000);
 
+async function createGroup(){
+    const groupName = "group1";
+    const obj = {
+        groupName,
+        userId: myId
+    }
+
+    const response = await axios.post("http://localhost:4000/groups/create-group",obj, {headers: {authorization: token}});
+}
+
 async function sendMessage() {
     console.log("Called");
     try{
-        const decodeToken = parseJwt(token);
-        const user = decodeToken.name;
         const message = messageField.value;
         const res = await axios.post("http://localhost:4000/user/sendMessage", {message_text: message},{headers: {authorization: token, lastId: localStorage.getItem("lastID")}});
         messageField.value = "";  
